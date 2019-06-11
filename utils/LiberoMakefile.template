@@ -1,0 +1,210 @@
+#!Makefile
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+F_DIR			  := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+NOCM				:= ./_.nocm/microsemi/libero/polarfire/
+R_DIR				:= _.nocm/microsemi/libero/polarfire/run 
+COMPILE_LOC := $(F_DIR)/_.nocm/microsemi/libero/polarfire/
+ECHO            := echo
+LIBS						:= /scratch/Polarfire_v2.2_Questasim_10.5c/
+VAULT           := /apps/libero_polarfire_2.3/Libero/data/vault
+LM_LICENSE_FILE := 1702@actel.lic.tuc.us.ray.com
+TOPNAME 				:= apf_top
+TOPLIB					:= work 
+DIE		 					:= MPF300T
+SPEED	 					:=	-1
+PACK	 					:=	FCG484
+D_VOLT 					:=	1.0
+FAM		 					:=	PolarFire
+PF_VER          := /apps/libero_polarfire_2.3/Libero/bin/libero
+
+
+.PHONY: default dirs clean_dir
+
+default: help
+
+.PHONY: phys
+
+
+help:
+	@$(ECHO)
+	@$(ECHO) "LICENSE FILE" $(LM_LICENSE_FILE)
+	@$(ECHO) "LIBS            $(LIBS)"
+	@$(ECHO) "VAULT           $(VAULT)"
+	@$(ECHO) "TOPNAME         $(TOPNAME)"
+	@$(ECHO) "DIE             $(DIE)"
+	@$(ECHO) "Speed           $(SPEED)"
+	@$(ECHO) "Package         $(PACK)"
+	@$(ECHO) "Die Voltage     $(D_VOLT)"
+	@$(ECHO) "FAM             $(FAM)"
+	@$(ECHO) "makefile path   $(mkfile_path)"
+	@$(ECHO) "files dir       $(F_DIR)"
+
+
+dirs:
+	mkdir -p $(NOCM)run
+
+clean_dir:
+	@$(EHCO) $(RM) -rfv $(NOCM)run/ 
+
+
+regress: 
+
+
+project: clean_dir dirs
+	@$(ECHO) "Making TCL for phys'ing Polarfire..."
+	@$(ECHO) "new_project \\" > $(NOCM)/new_project.tcl		
+	@$(ECHO) " -location {$(COMPILE_LOC)/run/_api/_run} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -name {$(TOPNAME)} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -project_description {Makefile generated PolarFire project.} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -hdl {VHDL} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -family {$(FAM)} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -die {$(DIE)} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -package {$(PACK)} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -speed {$(SPEED)} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -part_range {IND} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -die_voltage {$(D_VOLT)} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -block_mode 0 \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -standalone_peripheral_initialization 0 \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -instantiate_in_smartdesign 1 \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -ondemand_build_dh 1 \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -use_enhanced_constraint_flow 1 \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {DSW_VCCA_VOLTAGE_RAMP_RATE:10_MS} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {IO_DEFT_STD:LVCMOS 3.3V} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {RESTRICTPROBEPINS:0} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {RESTRICTSPIPINS:0} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {SYSTEM_CONTROLLER_SUSPEND_MODE:0} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {TEMPR:IND} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {VCCI_1.2_VOLTR:EXT} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {VCCI_1.5_VOLTR:EXT} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {VCCI_1.8_VOLTR:EXT} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {VCCI_2.5_VOLTR:EXT} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {VCCI_3.3_VOLTR:EXT} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) " -adv_options {VOLTR:IND} " >> $(NOCM)/new_project.tcl
+	@$(ECHO) "import_files \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -verilog_netlist                      {$(F_DIR)/_.nocm/synopsys/synplify/O-2018.09/run/rev_1/$(TOPNAME).vm}" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "import_files \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -io_pdc                    {$(F_DIR)/phys/libero/$(TOPNAME).io.pdc}" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "import_files \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -sdc                       {$(F_DIR)/phys/libero/$(TOPNAME).timing.sdc}" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "set_root $(TOPNAME) " >> $(NOCM)/new_project.tcl
+	#@$(ECHO) "    -file {$(COMPILE_LOC)/run/_api/_run/synthesis/apf_top.vm} \\" >> $(NOCM)/new_project.tcl
+	#@$(EHCO) "    -designer_view {Impl1} \\" >> $(NOCM)/new_project.tcl
+	#@$(EHCO) "    -module {$(TOPNAME)}" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "organize_tool_files \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -tool                      {PLACEROUTE} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -file                      {$(COMPILE_LOC)run/_api/_run/constraint/io/$(TOPNAME).io.pdc} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -file                      {$(COMPILE_LOC)run/_api/_run/constraint/$(TOPNAME).timing.sdc} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -module                    {$(TOPNAME)} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -input_type                {constraint}" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "organize_tool_files \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -tool                      {VERIFYTIMING} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -file                      {$(COMPILE_LOC)run/_api/_run/constraint/$(TOPNAME).timing.sdc} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -module                    {$(TOPNAME)} \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -input_type                {constraint}" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "create_links \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -convert_EDN_to_HDL 0" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "build_design_hierarchy" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "save_project" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "close_project" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "save_log \\" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "    -file                      {$(COMPILE_LOC)run/new_project.log}" >> $(NOCM)/new_project.tcl
+	@$(ECHO) "Phys file made ..."
+	@$(ECHO) "Invoking polarfire $(PF_VER) ..."
+	$(PF_VER) SCRIPT:$(NOCM)/new_project.tcl
+	@$(ECHO) "Prj made ... Next step is compile..."
+
+
+compile_script: 
+	@$(ECHO)  "Compiling project using polarfire $(PF_VER)"
+	@$(ECHO)  "  open_project                   {$(COMPILE_LOC)run/_api/_run/$(TOPNAME).prjx}" >> $(NOCM)/compile.tcl
+	@$(ECHO)  "  run_tool \\" >> $(NOCM)/compile.tcl
+	@$(ECHO)  "      -name                      {COMPILE}" >> $(NOCM)/compile.tcl
+	@$(ECHO)  "  save_project" >> $(NOCM)/compile.tcl
+	@$(ECHO)  "  close_project" >> $(NOCM)/compile.tcl
+	@$(ECHO)  "  save_log \\" >> $(NOCM)/compile.tcl
+	@$(ECHO)  "      -file                      {$(COMPILE_LOC)run/compile.log}" >> $(NOCM)/compile.tcl
+	@$(ECHO)
+
+compile: compile_script
+	@$(ECHO) "Invoking polarfire $(PF_VER) ..."
+	$(PF_VER) SCRIPT:$(NOCM)/compile.tcl
+	@$(ECHO) "Next step is PAR..."
+
+place_and_route: 
+	@$(ECHO)  "Running PAR on project using polarfire $(PF_VER)"
+	@$(ECHO)  "  open_project                   {$(COMPILE_LOC)run/_api/_run/$(TOPNAME).prjx}" > $(NOCM)/place_and_route.tcl
+	#@$(ECHO)	"configure_snvm -cfg_file 				{$(COMPILE_LOC)run/_api/_run/designer/$(TOPNAME)/SNVM.cfg}" >> $(NOCM)/place_and_route.tcl
+	@$(ECHO)  "  update_and_run_tool \\" >> $(NOCM)/place_and_route.tcl
+	@$(ECHO)  "      -name                      {GENERATEPROGRAMMINGDATA}" >> $(NOCM)/place_and_route.tcl
+	@$(ECHO)  "  save_project" >> $(NOCM)/place_and_route.tcl
+	@$(ECHO)  "  close_project" >> $(NOCM)/place_and_route.tcl
+	@$(ECHO)  "  save_log \\" >> $(NOCM)/place_and_route.tcl
+	@$(ECHO)  "      -file                      {$(COMPILE_LOC)run/place_and_route.log}" >> $(NOCM)/place_and_route.tcl
+	@$(ECHO)
+
+par: place_and_route
+	@$(ECHO) "Invoking polarfire $(PF_VER) for place and route..."
+	$(PF_VER) SCRIPT:$(NOCM)/place_and_route.tcl
+	@$(ECHO) "Next step is reports..."
+
+reports: 
+	@$(ECHO)  "Generating reports with Polarfire $(PF_VER)"
+	@$(ECHO)  "  open_project                   {$(COMPILE_LOC)run/_api/_run/$(TOPNAME).prjx}" > $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "  configure_tool \\" >>  $(NOCM)/gen_reports.tcl 
+	@$(ECHO)  "    -name {VERIFYTIMING}												  \\" >>  $(NOCM)/gen_reports.tcl 
+	@$(ECHO)  "    -params {CONSTRAINTS_COVERAGE:1}             \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {FORMAT:XML}                         \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MAX_TIMING_FAST_HV_LT:1}            \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MAX_TIMING_SLOW_LV_HT:1}            \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MAX_TIMING_SLOW_LV_LT:1}            \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MAX_TIMING_VIOLATIONS_FAST_HV_LT:1} \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MAX_TIMING_VIOLATIONS_SLOW_LV_HT:1} \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MAX_TIMING_VIOLATIONS_SLOW_LV_LT:1} \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MIN_TIMING_FAST_HV_LT:1}            \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MIN_TIMING_SLOW_LV_HT:1}            \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MIN_TIMING_SLOW_LV_LT:1}            \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MIN_TIMING_VIOLATIONS_FAST_HV_LT:1} \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MIN_TIMING_VIOLATIONS_SLOW_LV_HT:1} \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "    -params {MIN_TIMING_VIOLATIONS_SLOW_LV_LT:1} \\" >>  $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "  update_and_run_tool \\" >> $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "      -name                      {VERIFYTIMING}" >> $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "  update_and_run_tool \\" >> $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "      -name                      {VERIFYPOWER}" >> $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "  save_project" >> $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "  close_project" >> $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "  save_log \\" >> $(NOCM)/gen_reports.tcl
+	@$(ECHO)  "      -file                      {$(COMPILE_LOC)run/gen_reports.log}" >> $(NOCM)/gen_reports.tcl
+	@$(ECHO)
+	@$(ECHO) "Invoking polarfire $(PF_VER) for place and route..."
+	$(PF_VER) SCRIPT:$(NOCM)/gen_reports.tcl
+
+
+
+bitstream: 
+	@$(ECHO) "Creating bitstream and exporting to bitstream file at top level.."
+	@$(ECHO)
+	@$(ECHO)  " run_tool -name {GENERATEPROGRAMMINGFILE}"																																 >> $(NOCM)/bitstream.tcl 
+	@$(ECHO)  " export_bitstream_file \\"                                                                                >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -file_name {apf_top} \\"                                                                        >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -export_dir {$(F_DIR)/bit_streams} \\" >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -format {STP DAT SPI} \\"                                                                       >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -master_file 0 \\"                                                                              >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -master_file_components {} \\"                                                                  >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -encrypted_uek1_file 0 \\"                                                                      >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -encrypted_uek1_file_components {} \\"                                                          >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -encrypted_uek2_file 0 \\"                                                                      >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -encrypted_uek2_file_components {} \\"                                                          >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -trusted_facility_file 1 \\"                                                                    >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -trusted_facility_file_components {FABRIC SNVM} \\"                                             >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -zeroization_likenew_action 0 \\"                                                               >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -zeroization_unrecoverable_action 0 \\"                                                         >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -master_backlevel_bypass 0 \\"                                                                  >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -uek1_backlevel_bypass 0 \\"                                                                    >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "          -uek2_backlevel_bypass 0"                                                                    	 >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "  save_project" >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "  close_project" >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "  save_log \\" >> $(NOCM)/bitstream.tcl
+	@$(ECHO)  "      -file                      {$(COMPILE_LOC)run/bitstream.log}" >> $(NOCM)/bitstream.tcl
+	@$(ECHO) "Invoking polarfire $(PF_VER) for place and route..."
+	$(PF_VER) SCRIPT:$(NOCM)/bitstream.tcl
+	@$(ECHO) "Done"
