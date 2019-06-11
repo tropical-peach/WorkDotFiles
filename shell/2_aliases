@@ -1,0 +1,39 @@
+
+
+alias ls='ls --color=auto' # color is useful.
+alias l='ls'  
+alias ll='ls -alFh'  
+alias la='ls -lAFh'   
+alias lr='ls -tRFh'   
+alias lt='ls -ltFh'   
+alias rm='mv -t ~/Trash/'
+alias cp='cp -i'
+alias mv='mv -i'
+alias mkdir='mkdir -p -v'
+alias df='df -h'
+alias du='du -h -c'
+alias biggest='BLOCKSIZE=1048576; du -x | sort -nr | head -10'
+alias remdir='"rm" -rf'
+alias trashman='"rm" -rf ~/Trash/*'
+alias zshrc="$EDITOR ~/.zshrc"
+alias blank="sleep 1 && xset dpms force off"
+alias lesslast="less !:*"
+alias -g L="| less"
+alias grep="grep --color"
+alias nuke='"rm" -rfv'
+
+## changing dirs with just dots. 
+alias .='cd ../'
+alias ..='cd ../../'
+alias ...='cd ../../../'
+alias ....='cd ../../../../'
+
+## MORE aliases that i use a lot.
+alias ps="ps aux"
+alias today='date "+%d %h %y"'
+alias now='date "+%A, %d %B, %G%t%H:%M %Z(%z)"'
+alias msgs='tail -f /var/log/messages'
+alias k=kill                     	# QUICKKEY - kill process
+alias e=$EDITOR                  	# QUICKKEY - edit quickly
+alias m=more                     	# QUICKKEY - yeah
+alias q=exit                     	# QUICKKEY - like vim
