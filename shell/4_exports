@@ -1,0 +1,23 @@
+#Environments  
+me=$(whoami)
+export EDITOR=vim
+export PAGER=less
+export LESS="--RAW-CONTROL-CHARS"
+
+export MANPATH=/usr/local/man:/usr/contrib/man:/projs/epd/man:/usr/man:/apps/contrib/man:/usr/bin/man:/usr/share/man:/usr/X11R6/man:/usr/local/share/man/
+export MANPATH=$MANPATH:/home/$me/bin/man
+
+export PATH="$PATH:/home/$me/bin:/home/$me/gits"
+
+export LM_LICENSE_FILE=""
+
+export SRC=/home/$me/environments/
+
+#------------------------------------------////
+# System Information:
+#------------------------------------------////
+clear
+echo -ne "${blue}Today is:\t\t${lightgreen}" `date`; echo ""
+echo -e "${blue}Kernel Information: \t${cyan}" `uname -smr`
+echo -ne "${purple}";upinfo;echo ""
+echo -e "${blue}"; cal -3
